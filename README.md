@@ -28,7 +28,7 @@ composer require clean-bandits/single-action-resource-controllers-for-laravel
 Optionally you can publish the config file with:
 
 ``` bash
-php artisan vendor:publish --provider="CleanBandits\SingleActionResourceControllers\SingleActionResourceControllersProvider" --tag="config"`  
+php artisan vendor:publish --provider="CleanBandits\SingleActionResourceControllers\SingleActionResourceControllersProvider" --tag="config"  
 ```
 
 This is the contents of the published configuration file:
