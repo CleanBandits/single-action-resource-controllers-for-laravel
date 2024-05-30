@@ -14,7 +14,7 @@ It's really simple:
 - Create new [Single Action Controllers](https://laravel.com/docs/11.x/controllers#single-action-controllers) for each
   action you need, like this:  
   ![controllers.png](controllers.png)
-- This will automatically create routes these routes:   
+- This will automatically create these routes:   
   ![routes.png](routes.png)
 
 ## Installation
