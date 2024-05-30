@@ -12,16 +12,25 @@ It's really simple:
 
 - Just add new single action resource route in your routes file, e.g `Route::singleActionResource('photos');`
 - Create new [Single Action Controllers](https://laravel.com/docs/11.x/controllers#single-action-controllers) for each
-  action you need, like this: ![controllers.png](controllers.png)
-- This will automatically create routes these routes: ![routes.png](routes.png)
+  action you need, like this:  
+  ![controllers.png](controllers.png)
+- This will automatically create routes these routes:   
+  ![routes.png](routes.png)
 
 ## Installation
 
-You can install the package via composer:  
-`composer require clean-bandits/single-action-resource-controllers-for-laravel`
+You can install the package via composer:
 
-Optionally you can publish the config file with:  
-`php artisan vendor:publish --provider="CleanBandits\SingleActionResourceControllers\SingleActionResourceControllersProvider" --tag="config"`  
+``` bash
+composer require clean-bandits/single-action-resource-controllers-for-laravel
+```
+
+Optionally you can publish the config file with:
+
+``` bash
+php artisan vendor:publish --provider="CleanBandits\SingleActionResourceControllers\SingleActionResourceControllersProvider" --tag="config"`  
+```
+
 This is the contents of the published config file:
 
 ```php
@@ -44,4 +53,6 @@ return [
 
 ## Testing
 
-`composer test`
+``` bash
+composer test
+```
