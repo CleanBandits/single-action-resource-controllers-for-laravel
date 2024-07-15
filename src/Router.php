@@ -2,37 +2,41 @@
 
 namespace CleanBandits\SingleActionResourceControllers;
 
+use Closure;
 use Illuminate\Routing\PendingResourceRegistration;
-use Illuminate\Routing\Router as DefaultRouter;
 
-class Router extends DefaultRouter
+class Router
 {
-    public function singleActionResources(array $resources, array $options = []): void
+    public function singleActionResources(): Closure
     {
-        foreach ($resources as $name => $controller) {
-            if (is_int($name)) {
-                $this->singleActionResource(name: $controller, options: $options);
-            } else {
-                $this->singleActionResource($name, $controller, $options);
+        return function (array $resources, array $options = []): void {
+            foreach ($resources as $name => $controller) {
+                if (is_int($name)) {
+                    $this->singleActionResource(name: $controller, options: $options);
+                } else {
+                    $this->singleActionResource($name, $controller, $options);
+                }
             }
-        }
+        };
     }
 
-    public function singleActionResource(string $name, ?string $controller = null, array $options = []): PendingResourceRegistration
+    public function singleActionResource(): Closure
     {
-        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
-            $registrar = $this->container->make(ResourceRegistrar::class);
-        } else {
-            $registrar = new ResourceRegistrar($this);
-        }
+        return function (string $name, ?string $controller = null, array $options = []): PendingResourceRegistration {
+            if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
+                $registrar = $this->container->make(ResourceRegistrar::class);
+            } else {
+                $registrar = new ResourceRegistrar($this);
+            }
 
-        return new PendingResourceRegistration(
-            $registrar, $name, $this->controller($name, $controller), $options
-        );
+            return new PendingResourceRegistration(
+                $registrar, $name, $this->controller($name, $controller), $options
+            );
+        };
     }
 
-    private function controller(string $name, ?string $controller): string
+    protected function controller(): Closure
     {
-        return $controller ?? str($name)->studly();
+        return fn (string $name, ?string $controller): string => $controller ?? str($name)->studly();
     }
 }

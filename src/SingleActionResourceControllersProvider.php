@@ -3,6 +3,7 @@
 namespace CleanBandits\SingleActionResourceControllers;
 
 use Illuminate\Support\ServiceProvider;
+use ReflectionException;
 
 class SingleActionResourceControllersProvider extends ServiceProvider
 {
@@ -13,13 +14,15 @@ class SingleActionResourceControllersProvider extends ServiceProvider
         ], 'config');
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function register(): void
     {
         $this->mergeConfigFrom(
             dirname(__DIR__) . '/config/single-action-resource-controllers.php', 'single-action-resource-controllers'
         );
-
         $this->app->bind(ResourceController::class, config('single-action-resource-controllers.resource_controller'));
-        $this->app->singleton('router', Router::class);
+        \Illuminate\Routing\Router::mixin(new Router());
     }
 }
