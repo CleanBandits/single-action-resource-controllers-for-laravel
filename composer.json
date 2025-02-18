@@ -40,6 +40,7 @@
     "code-quality": [
       "@php-cs-fixer"
     ],
+    "cq": "@code-quality",
     "php-cs-fixer": "php-cs-fixer fix"
   },
   "config": {
