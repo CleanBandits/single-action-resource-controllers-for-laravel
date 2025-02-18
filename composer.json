@@ -10,7 +10,10 @@
   "autoload": {
     "psr-4": {
       "CleanBandits\\SingleActionResourceControllers\\": "src/"
-    }
+    },
+    "files": [
+      "src/ide.php"
+    ]
   },
   "homepage": "https://github.com/CleanBandits/single-action-resource-controllers-for-laravel",
   "authors": [
