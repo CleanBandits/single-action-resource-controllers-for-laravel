@@ -27,14 +27,15 @@ class ResourceRegistrar extends \Illuminate\Routing\ResourceRegistrar
         $base = $this->getResourceWildcard(last(explode('.', $name)));
 
         $defaults = $this->resourceDefaults;
+        $namespace = isset($this->router->getGroupStack()[0]['namespace']) ? $this->router->getGroupStack()[0]['namespace'] : null;
 
         $collection = new RouteCollection();
         $resourceController = app(ResourceController::class);
         $resourceMethods = collect($this->getResourceMethods($defaults, $options))
-            ->filter(fn (string $action) => class_exists($resourceController->namespace($controller, $action)));
-        $resourceMethods->each(function (string $action) use ($name, $base, $controller, $options, $collection, $resourceMethods, $resourceController): void {
+            ->filter(fn (string $action) => class_exists($resourceController->namespace($controller, $action, $namespace)));
+        $resourceMethods->each(function (string $action) use ($name, $base, $controller, $options, $collection, $resourceMethods, $resourceController, $namespace): void {
             $route = $this->{'addResource' . ucfirst($action)}(
-                $name, $base, $resourceController->namespace($controller, $action), $options
+                $name, $base, $resourceController->namespace($controller, $action, $namespace), $options
             );
 
             if (isset($options['bindingFields'])) {
