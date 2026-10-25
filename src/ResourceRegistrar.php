@@ -27,7 +27,7 @@ class ResourceRegistrar extends \Illuminate\Routing\ResourceRegistrar
         $base = $this->getResourceWildcard(last(explode('.', $name)));
 
         $defaults = $this->resourceDefaults;
-        $namespace = isset($this->router->getGroupStack()[0]['namespace']) ? $this->router->getGroupStack()[0]['namespace'] : null;
+        $namespace = last($this->router->getGroupStack())['namespace'] ?? null;
 
         $collection = new RouteCollection();
         $resourceController = app(ResourceController::class);
