@@ -8,6 +8,10 @@ class ResourceRegistrar extends \Illuminate\Routing\ResourceRegistrar
 {
     public function register($name, $controller, array $options = []): RouteCollection
     {
+        if (config('single-action-resource-controllers.names_from_controller')) {
+            $options = $this->withNamesFromController($name, $controller, $options);
+        }
+
         if (isset($options['parameters']) && !isset($this->parameters)) {
             $this->parameters = $options['parameters'];
         }
@@ -59,5 +63,29 @@ class ResourceRegistrar extends \Illuminate\Routing\ResourceRegistrar
         $action['uses'] = preg_replace('/@(.*)/m', '@__invoke', $action['uses']);
 
         return $action;
+    }
+
+    /**
+     * Route names and parameters follow the controller name instead of the URI,
+     * e.g. ('gimenes-locekli', 'FamilyMembers') gets family-members.* names and a {familyMember} parameter.
+     * Names and parameters passed explicitly still win.
+     */
+    protected function withNamesFromController(string $name, string $controller, array $options): array
+    {
+        $resources = explode('.', $name);
+        $controllers = explode('.', $controller);
+
+        $options['names'] ??= collect($controllers)->map(fn (string $segment) => (string) str($segment)->kebab())->join('.');
+
+        if (count($resources) !== count($controllers) || (isset($options['parameters']) && !is_array($options['parameters']))) {
+            return $options;
+        }
+
+        $parameters = collect($resources)
+            ->combine(collect($controllers)->map(fn (string $segment) => (string) str($segment)->singular()->camel()))
+            ->all();
+        $options['parameters'] = ($options['parameters'] ?? []) + $parameters;
+
+        return $options;
     }
 }
