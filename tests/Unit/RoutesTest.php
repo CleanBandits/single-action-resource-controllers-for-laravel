@@ -93,3 +93,45 @@ test('nested resources', function (): void {
             ->toBe($this->controllersNamespace . $nestedPath . '\\' . $action . 'Controller');
     }
 });
+
+test('namespace of a group nested inside another group', function (): void {
+    // Prepare
+    $resource = 'photos';
+    $action = $this->actions[0];
+    $namespace = $this->controllersNamespace . 'Workspace';
+    $controllerClass = $namespace . '\\' . str($resource)->studly() . '\\' . $action . 'Controller';
+    $this->instance($controllerClass, $this->controllerMock($controllerClass));
+    /** @var Router $router */
+    $router = app('router');
+    // Act
+    $router->middleware('auth')->group(function () use ($router, $namespace, $resource): void {
+        $router->namespace($namespace)->group(function () use ($router, $resource): void {
+            $router->singleActionResource($resource);
+        });
+    });
+
+    $route = $router->getRoutes()->getByName($resource . '.' . strtolower($action));
+    // Assert
+    expect($route->getControllerClass())->toBe($controllerClass)
+        ->and($route->middleware())->toBe(['auth']);
+});
+
+test('relative namespaces of nested groups are merged', function (): void {
+    // Prepare
+    $resource = 'photos';
+    $action = $this->actions[0];
+    $controllerClass = $this->controllersNamespace . 'Modules\\Bookkeeping\\' . str($resource)->studly() . '\\' . $action . 'Controller';
+    $this->instance($controllerClass, $this->controllerMock($controllerClass));
+    /** @var Router $router */
+    $router = app('router');
+    // Act
+    $router->namespace($this->controllersNamespace . 'Modules')->group(function () use ($router, $resource): void {
+        $router->namespace('Bookkeeping')->group(function () use ($router, $resource): void {
+            $router->singleActionResource($resource);
+        });
+    });
+
+    $route = $router->getRoutes()->getByName($resource . '.' . strtolower($action));
+    // Assert
+    expect($route->getControllerClass())->toBe($controllerClass);
+});
