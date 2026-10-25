@@ -135,3 +135,56 @@ test('relative namespaces of nested groups are merged', function (): void {
     // Assert
     expect($route->getControllerClass())->toBe($controllerClass);
 });
+
+test('route names and parameters follow the controller when names_from_controller is on', function (): void {
+    // Prepare
+    config(['single-action-resource-controllers.names_from_controller' => true]);
+    $controllerClassBase = $this->controllersNamespace . 'FamilyMembers\\';
+    foreach ($this->actions as $action) {
+        $controllerClass = $controllerClassBase . $action . 'Controller';
+        $this->instance($controllerClass, $this->controllerMock($controllerClass));
+    }
+    /** @var Router $router */
+    $router = app('router');
+    // Act
+    $router->singleActionResource('gimenes-locekli', 'FamilyMembers');
+
+    $routes = $router->getRoutes();
+    // Assert
+    expect($routes->getByName('family-members.index')->uri())->toBe('gimenes-locekli')
+        ->and($routes->getByName('family-members.edit')->uri())->toBe('gimenes-locekli/{familyMember}/edit')
+        ->and($routes->getByName('family-members.update')->getControllerClass())->toBe($controllerClassBase . 'UpdateController')
+        ->and($routes->getByName('gimenes-locekli.index'))->toBeNull();
+});
+
+test('explicit names and parameters win over the ones from the controller', function (): void {
+    // Prepare
+    config(['single-action-resource-controllers.names_from_controller' => true]);
+    $controllerClass = $this->controllersNamespace . 'FamilyMembers\\EditController';
+    $this->instance($controllerClass, $this->controllerMock($controllerClass));
+    /** @var Router $router */
+    $router = app('router');
+    // Act
+    $router->singleActionResource('gimenes-locekli', 'FamilyMembers')
+        ->names('relatives')
+        ->parameters(['gimenes-locekli' => 'relative']);
+
+    $routes = $router->getRoutes();
+    // Assert
+    expect($routes->getByName('relatives.edit')->uri())->toBe('gimenes-locekli/{relative}/edit');
+});
+
+test('route names and parameters follow the uri by default', function (): void {
+    // Prepare
+    $controllerClass = $this->controllersNamespace . 'FamilyMembers\\EditController';
+    $this->instance($controllerClass, $this->controllerMock($controllerClass));
+    /** @var Router $router */
+    $router = app('router');
+    // Act
+    $router->singleActionResource('gimenes-locekli', 'FamilyMembers');
+
+    $routes = $router->getRoutes();
+    // Assert
+    expect($routes->getByName('gimenes-locekli.edit')->uri())->toBe('gimenes-locekli/{gimenes_locekli}/edit')
+        ->and($routes->getByName('family-members.edit'))->toBeNull();
+});
